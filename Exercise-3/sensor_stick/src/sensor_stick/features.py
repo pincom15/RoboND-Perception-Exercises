@@ -10,7 +10,7 @@ def rgb_to_hsv(rgb_list):
     return hsv_normalized
 
 
-def compute_color_histograms(cloud, using_hsv=False):
+def compute_color_histograms(cloud, using_hsv=True):
 
     # Compute histograms for the clusters
     point_colors_list = []
@@ -32,15 +32,23 @@ def compute_color_histograms(cloud, using_hsv=False):
         channel_1_vals.append(color[0])
         channel_2_vals.append(color[1])
         channel_3_vals.append(color[2])
-    
+
     # TODO: Compute histograms
+    nbins=4
+    bins_range=(0, 256)
+
+    # Compute the histogram of the channels separately
+    channel_1_hist = np.histogram(channel_1_vals, bins=nbins, range=bins_range)
+    channel_2_hist = np.histogram(channel_2_vals, bins=nbins, range=bins_range)
+    channel_3_hist = np.histogram(channel_3_vals, bins=nbins, range=bins_range)
 
     # TODO: Concatenate and normalize the histograms
+    hist_features = np.concatenate((channel_1_hist[0], channel_2_hist[0], channel_1_hist[0])).astype(np.float64)
 
-    # Generate random features for demo mode.  
-    # Replace normed_features with your feature vector
-    normed_features = np.random.random(96) 
-    return normed_features 
+    # Normalize the result
+    normed_features = hist_features / np.sum(hist_features)
+
+    return normed_features
 
 
 def compute_normal_histograms(normal_cloud):
@@ -56,11 +64,18 @@ def compute_normal_histograms(normal_cloud):
         norm_z_vals.append(norm_component[2])
 
     # TODO: Compute histograms of normal values (just like with color)
+    nbins=4
+    bins_range=(-1, 1)
+
+    # Compute the histogram of the channels separately
+    norm_x_hist = np.histogram(norm_x_vals, bins=nbins, range=bins_range)
+    norm_y_hist = np.histogram(norm_y_vals, bins=nbins, range=bins_range)
+    norm_z_hist = np.histogram(norm_z_vals, bins=nbins, range=bins_range)
 
     # TODO: Concatenate and normalize the histograms
+    hist_features = np.concatenate((norm_x_hist[0], norm_y_hist[0], norm_z_hist[0])).astype(np.float64)
 
-    # Generate random features for demo mode.  
-    # Replace normed_features with your feature vector
-    normed_features = np.random.random(96)
+    # Normalize the result
+    normed_features = hist_features / np.sum(hist_features)
 
     return normed_features
